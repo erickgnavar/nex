@@ -8,6 +8,7 @@ import Phoenix.Channel
 import Json.Encode as Encode
 import Json.Decode as Decode
 import Json.Decode.Pipeline as Pipeline
+import Http
 
 
 main : Program Never Model Msg
@@ -36,6 +37,10 @@ type alias Model =
     }
 
 
+type alias PostsResponse =
+    { data : List Post }
+
+
 initPhxSocket : Phoenix.Socket.Socket Msg
 initPhxSocket =
     Phoenix.Socket.init socketServer
@@ -52,7 +57,7 @@ initialModel =
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, Cmd.none )
+    ( initialModel, fetchPosts )
 
 
 
@@ -65,6 +70,7 @@ type Msg
     | PhoenixMsg (Phoenix.Socket.Msg Msg)
     | JoinChannel
     | Dummy String
+    | FetchPosts (Result Http.Error PostsResponse)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -103,6 +109,12 @@ update msg model =
         Dummy str ->
             ( model, Cmd.none )
 
+        FetchPosts (Ok response) ->
+            ( { model | posts = response.data }, Cmd.none )
+
+        FetchPosts (Err err) ->
+            ( model, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -112,6 +124,24 @@ subscriptions model =
 socketServer : String
 socketServer =
     "ws://localhost:4000/socket/websocket"
+
+
+fetchPosts : Cmd Msg
+fetchPosts =
+    let
+        url =
+            "/api/posts/"
+
+        request =
+            Http.get url postsResponseDecoder
+    in
+        Http.send FetchPosts request
+
+
+postsResponseDecoder : Decode.Decoder PostsResponse
+postsResponseDecoder =
+    Pipeline.decode PostsResponse
+        |> Pipeline.required "data" (Decode.list postDecoder)
 
 
 postDecoder : Decode.Decoder Post
@@ -133,8 +163,19 @@ view model =
             , class "btn btn-primary"
             ]
             [ text "Join to channel" ]
-        , postListView model.posts
+        , postsContainer model
         ]
+
+
+postsContainer : Model -> Html Msg
+postsContainer model =
+    div
+        [ style
+            [ ( "height", "400px" )
+            , ( "overflow", "scroll" )
+            ]
+        ]
+        [ postListView model.posts ]
 
 
 postView : Post -> Html Msg
