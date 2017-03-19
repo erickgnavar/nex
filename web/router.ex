@@ -20,7 +20,9 @@ defmodule Nex.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", Nex do
-  #   pipe_through :api
-  # end
+  scope "/api", Nex do
+    pipe_through :api
+
+    resources "/posts", PostController
+  end
 end

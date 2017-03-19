@@ -2,7 +2,7 @@ defmodule Nex.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", Nex.RoomChannel
+  channel "news:*", Nex.NewsChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
