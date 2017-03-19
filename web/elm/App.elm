@@ -1,7 +1,6 @@
 module App exposing (..)
 
 import Html exposing (..)
-import Html.Events exposing (onClick)
 import Html.Attributes exposing (..)
 import Phoenix.Socket
 import Phoenix.Channel
@@ -9,6 +8,7 @@ import Json.Encode as Encode
 import Json.Decode as Decode
 import Json.Decode.Pipeline as Pipeline
 import Http
+import Task
 
 
 main : Program Never Model Msg
@@ -57,7 +57,8 @@ initialModel =
 
 init : ( Model, Cmd Msg )
 init =
-    ( initialModel, fetchPosts )
+    --TODO: Find a better way to auto connect to channel
+    ( initialModel, Cmd.batch [ fetchPosts, send JoinChannel ] )
 
 
 
@@ -116,6 +117,12 @@ update msg model =
             ( model, Cmd.none )
 
 
+send : Msg -> Cmd Msg
+send msg =
+    Task.succeed msg
+        |> Task.perform identity
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Phoenix.Socket.listen model.phxSocket PhoenixMsg
@@ -158,12 +165,7 @@ postDecoder =
 view : Model -> Html Msg
 view model =
     div []
-        [ button
-            [ onClick JoinChannel
-            , class "btn btn-primary"
-            ]
-            [ text "Join to channel" ]
-        , postsContainer model
+        [ postsContainer model
         ]
 
 
