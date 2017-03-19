@@ -14,7 +14,8 @@ defmodule Nex.PostController do
     case Repo.insert(changeset) do
       {:ok, post} ->
         # broadcast info to all the sockets
-        Nex.Endpoint.broadcast("news:lobby", "new:post", post_params)
+        rendered_post = Nex.PostView.render("post.json", %{post: post})
+        Nex.Endpoint.broadcast("news:lobby", "new:post", rendered_post)
         conn
         |> put_status(:created)
         |> put_resp_header("location", post_path(conn, :show, post))
