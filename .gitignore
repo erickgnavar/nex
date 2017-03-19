@@ -24,3 +24,6 @@ erl_crash.dump
 /config/prod.secret.exs
 # dev environment variables
 .envrc
+
+# elm packages
+web/elm/elm-stuff/
