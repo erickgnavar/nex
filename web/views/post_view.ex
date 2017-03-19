@@ -10,8 +10,10 @@ defmodule Nex.PostView do
   end
 
   def render("post.json", %{post: post}) do
-    %{id: post.id,
+    %{
+      id: post.id,
       title: post.title,
-      body: post.body}
+      body: post.body
+    }
   end
 end

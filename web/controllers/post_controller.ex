@@ -4,7 +4,7 @@ defmodule Nex.PostController do
   alias Nex.Post
 
   def index(conn, _params) do
-    posts = Repo.all(Post)
+    posts = Post |> Post.latest |> Repo.all
     render(conn, "index.json", posts: posts)
   end
 

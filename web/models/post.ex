@@ -16,4 +16,10 @@ defmodule Nex.Post do
     |> cast(params, [:title, :body])
     |> validate_required([:title, :body])
   end
+
+  def latest(query) do
+    query
+    |> order_by(desc: :inserted_at)
+    |> limit(10)
+  end
 end
