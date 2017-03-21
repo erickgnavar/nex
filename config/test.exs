@@ -14,6 +14,6 @@ config :nex, Nex.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: System.get_env("DB_USER"),
   password: System.get_env("DB_PASSWORD"),
-  database: System.get_env("DB_NAME"),
+  database: "nex_test",
   hostname: System.get_env("DB_HOST"),
   pool: Ecto.Adapters.SQL.Sandbox
