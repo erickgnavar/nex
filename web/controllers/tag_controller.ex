@@ -3,6 +3,8 @@ defmodule Nex.TagController do
 
   alias Nex.Tag
 
+  plug Nex.Plugs.CheckToken when action in[:create, :update, :delete]
+
   def index(conn, _params) do
     tags = Repo.all(Tag)
     render(conn, "index.json", tags: tags)

@@ -6,7 +6,11 @@ defmodule Nex.PostControllerTest do
   @invalid_attrs %{}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    token = Nex.Token.new
+    conn = conn
+    |> put_req_header("accept", "application/json")
+    |> put_req_header("authorization", "Token #{token.value}")
+    {:ok, conn: conn}
   end
 
   test "lists all entries on index", %{conn: conn} do

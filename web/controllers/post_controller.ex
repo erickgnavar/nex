@@ -3,6 +3,8 @@ defmodule Nex.PostController do
 
   alias Nex.{Post, Tag}
 
+  plug Nex.Plugs.CheckToken when action in[:create, :update, :delete]
+
   def index(conn, _params) do
     posts = Post |> Post.latest |> Repo.all
     render(conn, "index.json", posts: posts)
