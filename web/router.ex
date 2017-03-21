@@ -24,5 +24,6 @@ defmodule Nex.Router do
     pipe_through :api
 
     resources "/posts", PostController
+    resources "/tags", TagController
   end
 end
