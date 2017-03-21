@@ -28,7 +28,12 @@ main =
 type alias Post =
     { title : String
     , body : String
+    , tags : List Tag
     }
+
+
+type alias Tag =
+    { name : String }
 
 
 type alias Model =
@@ -156,6 +161,13 @@ postDecoder =
     Pipeline.decode Post
         |> Pipeline.required "title" Decode.string
         |> Pipeline.required "body" Decode.string
+        |> Pipeline.required "tags" (Decode.list tagDecoder)
+
+
+tagDecoder : Decode.Decoder Tag
+tagDecoder =
+    Pipeline.decode Tag
+        |> Pipeline.required "name" Decode.string
 
 
 
@@ -190,8 +202,18 @@ postView post =
             , p [ class "card-text" ]
                 [ text post.body
                 ]
+            , div
+                []
+                (post.tags
+                    |> List.map tagView
+                )
             ]
         ]
+
+
+tagView : Tag -> Html Msg
+tagView tag =
+    span [ class "badge badge-primary" ] [ text tag.name ]
 
 
 postListView : List Post -> Html Msg
