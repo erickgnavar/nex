@@ -18,3 +18,11 @@ Ready to run in production? Please [check our deployment guides](http://www.phoe
   * Docs: https://hexdocs.pm/phoenix
   * Mailing list: http://groups.google.com/group/phoenix-talk
   * Source: https://github.com/phoenixframework/phoenix
+
+## Generate token
+
+Call to `Nex.Token.new`
+
+## Send authorization token
+
+Use the http header `Authorization: Token token_value`
