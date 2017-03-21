@@ -1,7 +1,7 @@
 defmodule Nex.PostControllerTest do
   use Nex.ConnCase
 
-  alias Nex.Post
+  alias Nex.{Post, Tag}
   @valid_attrs %{body: "some content", title: "some content"}
   @invalid_attrs %{}
 
@@ -17,9 +17,12 @@ defmodule Nex.PostControllerTest do
   test "shows chosen resource", %{conn: conn} do
     post = Repo.insert! %Post{}
     conn = get conn, post_path(conn, :show, post)
-    assert json_response(conn, 200)["data"] == %{"id" => post.id,
+    assert json_response(conn, 200)["data"] == %{
+      "id" => post.id,
       "title" => post.title,
-      "body" => post.body}
+      "body" => post.body,
+      "tags" => []
+    }
   end
 
   test "renders page not found when id is nonexistent", %{conn: conn} do
@@ -31,7 +34,16 @@ defmodule Nex.PostControllerTest do
   test "creates and renders resource when data is valid", %{conn: conn} do
     conn = post conn, post_path(conn, :create), post: @valid_attrs
     assert json_response(conn, 201)["data"]["id"]
-    assert Repo.get_by(Post, @valid_attrs)
+    assert Repo.get_by(Post, @valid_attrs |> Map.delete(:tags))
+  end
+
+  test "creates and renders resource when data is valid and includes tag ids", %{conn: conn} do
+    tag = Repo.insert! %Tag{}
+    attrs = @valid_attrs |> Map.put("tags", [tag.id])
+    conn = post conn, post_path(conn, :create), post: attrs
+    assert json_response(conn, 201)["data"]["id"]
+    assert Repo.get_by(Post, @valid_attrs |> Map.delete(:tags))
+    # TODO: add asssertion to check middle table insertion
   end
 
   test "does not create resource and renders errors when data is invalid", %{conn: conn} do
@@ -43,7 +55,7 @@ defmodule Nex.PostControllerTest do
     post = Repo.insert! %Post{}
     conn = put conn, post_path(conn, :update, post), post: @valid_attrs
     assert json_response(conn, 200)["data"]["id"]
-    assert Repo.get_by(Post, @valid_attrs)
+    assert Repo.get_by(Post, @valid_attrs |> Map.delete(:tags))
   end
 
   test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do

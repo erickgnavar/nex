@@ -13,7 +13,16 @@ defmodule Nex.PostView do
     %{
       id: post.id,
       title: post.title,
-      body: post.body
+      body: post.body,
+      tags: render_tags(post.tags)
     }
+  end
+
+  defp render_tags(tags) do
+    tags
+    |> Enum.map(fn tag ->
+      Nex.TagView.render("tag.json", %{tag: tag})
+    # use this way to avoid add "data" key in result
+    end)
   end
 end

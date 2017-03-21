@@ -1,7 +1,7 @@
 defmodule Nex.PostController do
   use Nex.Web, :controller
 
-  alias Nex.Post
+  alias Nex.{Post, Tag}
 
   def index(conn, _params) do
     posts = Post |> Post.latest |> Repo.all
@@ -9,7 +9,8 @@ defmodule Nex.PostController do
   end
 
   def create(conn, %{"post" => post_params}) do
-    changeset = Post.changeset(%Post{}, post_params)
+    tags = Tag |> Tag.by_ids(Map.get(post_params, "tags", [])) |> Repo.all
+    changeset = Post.changeset(%Post{}, post_params |> Map.put("tags", tags))
 
     case Repo.insert(changeset) do
       {:ok, post} ->
@@ -28,12 +29,12 @@ defmodule Nex.PostController do
   end
 
   def show(conn, %{"id" => id}) do
-    post = Repo.get!(Post, id)
+    post = Repo.get!(Post, id) |> Repo.preload(:tags)
     render(conn, "show.json", post: post)
   end
 
   def update(conn, %{"id" => id, "post" => post_params}) do
-    post = Repo.get!(Post, id)
+    post = Repo.get!(Post, id) |> Repo.preload(:tags)
     changeset = Post.changeset(post, post_params)
 
     case Repo.update(changeset) do
