@@ -2,12 +2,12 @@ module App exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Phoenix.Socket
-import Phoenix.Channel
-import Json.Encode as Encode
+import Http
 import Json.Decode as Decode
 import Json.Decode.Pipeline as Pipeline
-import Http
+import Json.Encode as Encode
+import Phoenix.Channel
+import Phoenix.Socket
 import Task
 
 
